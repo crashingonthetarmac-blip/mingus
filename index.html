@@ -47,65 +47,10 @@
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open('', '_blank', 'width=400,height=300,fullscreen');
+            const popup = window.open('https://www.youtube.com/watch?v=sdUUx5FdySs', '_blank', 'width=400,height=300,fullscreen');
             if (popup) {
                 popupCount++;
                 activePopups.push(popup);
-                const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
-                popup.document.write(`
-                    <html>
-                    <head>
-                        <title>Popup #${popupCount}</title>
-                        <style>
-                            body {
-                                font-family: Arial, sans-serif;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                height: 100vh;
-                                margin: 0;
-                                background: #333333;
-                            }
-                            h1 {
-                                color: #999999;
-                                font-size: 24px;
-                                text-align: center;
-                            }
-                            p {
-                                color: #666666;
-                                text-align: center;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${randomMessage}</h1>
-                        <p>Popup #${popupCount} of ${maxPopups}</p>
-                        <p style="font-size: 12px;">You cannot close this window</p>
-                    </body>
-                    </html>
-                `);
-                
-                // Make popup extremely hard to close
-                popup.onbeforeunload = function() {
-                    return "Are you sure you want to leave?";
-                };
-                
-                // Try to prevent closing and spawn many new windows
-                popup.onunload = function() {
-                    for(let i = 0; i < 20; i++) {
-                        window.open('', '_blank', 'width=400,height=300,fullscreen');
-                    }
-                };
-                
-                // Prevent right-click
-                popup.document.addEventListener('contextmenu', e => e.preventDefault());
-                
-                // Prevent keyboard shortcuts
-                popup.document.addEventListener('keydown', e => {
-                    if(e.ctrlKey || e.altKey || e.metaKey) {
-                        e.preventDefault();
-                    }
-                });
                 
                 // Position popup randomly
                 const randomX = Math.random() * (screen.width - 400);
