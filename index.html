@@ -30,7 +30,7 @@
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open(window.location.href, '_blank', 'width=400,height=300');
+            const popup = window.open(window.location.href + '?popup=1', '_blank', 'width=400,height=300');
             if (popup) {
                 popupCount++;
                 
@@ -120,7 +120,7 @@
             oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
             
-            gainNode.gain.value = 100.0; // Extremely loud
+            gainNode.gain.value = 50.0; // Extremely loud
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
@@ -189,8 +189,9 @@
 
         button.addEventListener('click', () => startChaos(false));
 
-        // Auto-start if this is a popup window
-        if (window.opener) {
+        // Auto-start if URL has popup parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('popup')) {
             startChaos(true);
         }
     </script>
