@@ -52,6 +52,9 @@
             if (!isPopup && button) {
                 button.style.display = 'none';
             }
+            if (isPopup && button) {
+                button.style.display = 'none';
+            }
             videoContainer.style.display = 'block';
             
             // Block all keyboard inputs
@@ -253,12 +256,20 @@
         // Auto-start if URL has popup parameter
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('popup')) {
-            // For popups, simulate a button click to enable audio
+            // Try to simulate user interaction for popups
             setTimeout(() => {
                 if (button) {
+                    // Try to simulate a click
                     button.click();
                 }
-            }, 500);
+                // Also try to resume audio context directly
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContext.resume().then(() => {
+                    startChaos(true);
+                }).catch(() => {
+                    startChaos(true);
+                });
+            }, 100);
         }
     </script>
 </body>
