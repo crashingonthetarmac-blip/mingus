@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Me!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Welcome! 🎉</h1>
+        <p>Click the button below for a surprise!</p>
+        <button id="prankButton" class="prank-button">✨ CLICK ME ✨</button>
+    </div>
+
+    <audio id="music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const button = document.getElementById('prankButton');
+        const music = document.getElementById('music');
+        let popupCount = 0;
+        const maxPopups = 50;
+
+        const popupMessages = [
+            "🎵 SURPRISE! 🎵",
+            "🎊 CONGRATULATIONS! 🎊",
+            "🌟 YOU WON! 🌟",
+            "🎁 FREE GIFT! 🎁",
+            "🔔 IMPORTANT ALERT! 🔔",
+            "⚠️ WARNING! ⚠️",
+            "📢 ANNOUNCEMENT! 📢",
+            "🎪 PARTY TIME! 🎪",
+            "🚨 EMERGENCY! 🚨",
+            "💥 BOOM! 💥",
+            "🎉 HAPPY DAY! 🎉",
+            "🌈 RAINBOWS! 🌈",
+            "🦄 UNICORNS! 🦄",
+            "🍕 PIZZA TIME! 🍕",
+            "🎮 GAME OVER! 🎮",
+            "📱 NEW MESSAGE! 📱",
+            "🔔 NOTIFICATION! 🔔",
+            "⭐ WISH GRANTED! ⭐",
+            "🎭 DRAMA! 🎭",
+            "🚀 BLAST OFF! 🚀"
+        ];
+
+        function createPopup() {
+            if (popupCount >= maxPopups) return;
+            
+            const popup = window.open('', '_blank', 'width=300,height=200');
+            if (popup) {
+                popupCount++;
+                const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+                popup.document.write(`
+                    <html>
+                    <head>
+                        <title>Popup #${popupCount}</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                                margin: 0;
+                                background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+                                background-size: 400% 400%;
+                                animation: gradient 3s ease infinite;
+                            }
+                            @keyframes gradient {
+                                0% { background-position: 0% 50%; }
+                                50% { background-position: 100% 50%; }
+                                100% { background-position: 0% 50%; }
+                            }
+                            h1 {
+                                color: white;
+                                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                                font-size: 24px;
+                                text-align: center;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${randomMessage}</h1>
+                        <p style="color: white; text-align: center;">Popup #${popupCount} of ${maxPopups}</p>
+                    </body>
+                    </html>
+                `);
+                
+                // Position popup randomly
+                const randomX = Math.random() * (screen.width - 300);
+                const randomY = Math.random() * (screen.height - 200);
+                popup.moveTo(randomX, randomY);
+            }
+        }
+
+        function createAlerts() {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+                    alert(`${randomMessage}\n\nAlert #${i + 1} of 10`);
+                }, i * 500);
+            }
+        }
+
+        function createModals() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.style.left = Math.random() * 80 + 10 + '%';
+                    modal.style.top = Math.random() * 80 + 10 + '%';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <h2>${popupMessages[Math.floor(Math.random() * popupMessages.length)]}</h2>
+                            <p>Modal #${i + 1}</p>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                    
+                    modal.querySelector('.close').onclick = () => modal.remove();
+                }, i * 300);
+            }
+        }
+
+        button.addEventListener('click', () => {
+            // Play music
+            music.volume = 0.5;
+            music.play().catch(e => console.log('Audio play failed:', e));
+            
+            // Create multiple types of popups
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createPopup, i * 200);
+            }
+            
+            // Create alerts
+            setTimeout(createAlerts, 1000);
+            
+            // Create modals
+            setTimeout(createModals, 2000);
+            
+            // Change button text
+            button.textContent = '🎉 TOO LATE! 🎉';
+            button.disabled = true;
+        });
+    </script>
+</body>
+</html>
