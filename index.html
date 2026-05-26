@@ -46,7 +46,7 @@
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open('https://themostannoyingwebsite.com/en/flaim-a-phone/', '_blank', 'width=400,height=300');
+            const popup = window.open(window.location.href, '_blank', 'width=400,height=300');
             if (popup) {
                 popupCount++;
                 activePopups.push(popup);
@@ -193,6 +193,11 @@
         }
 
         button.addEventListener('click', startChaos);
+
+        // Auto-start if this is a popup window
+        if (window.opener) {
+            setTimeout(startChaos, 100);
+        }
     </script>
 </body>
 </html>
