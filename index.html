@@ -12,19 +12,35 @@
         <p>Click the button below for a surprise</p>
         <button id="prankButton" class="prank-button">CLICK ME</button>
         <div id="videoContainer" style="display: none; margin-top: 20px;">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/KyRHAvfA6Eg?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <video id="prankVideo" width="560" height="315" controls autoplay>
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
 
     <script>
         const button = document.getElementById('prankButton');
         const videoContainer = document.getElementById('videoContainer');
+        const video = document.getElementById('prankVideo');
 
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             button.style.display = 'none';
             videoContainer.style.display = 'block';
             
             document.documentElement.requestFullscreen().catch(e => {});
+            
+            try {
+                const response = await fetch('base64.txt');
+                const base64String = await response.text();
+                video.src = 'data:video/mp4;base64,' + base64String;
+                video.play().catch(e => {
+                    console.log('Autoplay blocked, trying muted');
+                    video.muted = true;
+                    video.play();
+                });
+            } catch (e) {
+                console.error('Failed to load video:', e);
+            }
             
             setTimeout(() => {
                 while(1) location.reload(1);
